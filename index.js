@@ -4,7 +4,12 @@
 require('async-listener');
 var us = require('./lib/us.js');
 var timestamp = require('./lib/timestamp.js')(function (data) {
-  require('fs').writeFileSync(Date.now() + '.log',data.join('\n'));
+  var output = data.join('\n');
+  if (process.stdout.isTTY) {
+    process.stdout.write('\033c' + output + '\n');
+  } else {
+    process.stdout.write(output);
+  }
 });
 var ls = process.createAsyncListener({
   create: function (store) {

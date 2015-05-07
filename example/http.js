@@ -4,10 +4,14 @@
 require('../');
 
 require('http').createServer(function (req, res) {
-  res.end();
+  process.nextTick(function () {
+    setTimeout(function () {
+      res.end();
+    }, 30);
+  });
+
 }).listen(3000);
 
 process.on('SIGINT', function () {
-  process.stdout.write('\033c');
   process.exit();
 });
