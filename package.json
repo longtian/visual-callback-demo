@@ -21,6 +21,7 @@
   },
   "homepage": "https://github.com/wyvernnot/visual-callback-demo",
   "dependencies": {
-    "async-listener": "^0.5.2"
+    "async-listener": "^0.5.2",
+    "express": "^4.12.3"
   }
 }

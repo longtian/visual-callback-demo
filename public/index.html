@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>Visual</title>
+    <script type="text/javascript" src="jquery-2.1.4.min.js"></script>
+    <style type="text/css">
+        * {
+            padding: 0;
+            margin: 0;
+        }
+
+        #container {
+            background: black;
+            width: 100%;
+            position: relative;
+            height: 20em;
+        }
+
+        #container .item {
+            cursor: crosshair;
+            color: greenyellow;
+            position: absolute;
+        }
+    </style>
+</head>
+<body>
+<form>
+    <textarea id="in">process.nextTick(function () {
+
+  setTimeout(function () {
+    process.nextTick(function () {
+    })
+  }, 0)
+  process.nextTick(function () {
+  });
+
+  process.nextTick(function () {
+    process.nextTick(function () {
+    });
+  });
+
+  process.nextTick(function () {
+  });
+});
+
+process.nextTick(function () {
+  process.nextTick(function () {
+  });
+});
+
+process.nextTick(function () {
+});</textarea>
+    <button id="evalBtn">Eval</button>
+</form>
+<div id="container"></div>
+<script type="text/javascript">
+    $('#evalBtn').click(function () {
+        $.getJSON('/eval', {code: $('#in').val()}, function (list) {
+            drawData(list);
+        });
+        return false;
+    });
+
+    function drawData(list) {
+        $('#container').html('');
+        var start = list[0][2];
+        var totalDuration = list[list.length - 1][2] - start;
+        totalDuration *= 1.02;
+        console.log(totalDuration);
+        $.each(list, function (i, item) {
+            item.splice(1, 0, 100 * (item[2] - start) / totalDuration);
+        });
+
+        var last = '';
+        var line = 0;
+        var new_height = 0;
+        $.each(list, function (i, item) {
+            if (item[0] != last && item[0] === '{') {
+                item.splice(1, 0, ++line);
+            } else {
+                item.splice(1, 0, line);
+            }
+            last = item[0];
+
+            $('<span>').addClass('item')
+                    .text(item[0])
+                    .attr('title', item[4] - start)
+                    .css({
+                        top: item[1] + 'em',
+                        left: item[2] + "%"
+                    })
+                    .appendTo('#container');
+            new_height = item[1] + 1;
+            console.log(item);
+        });
+
+        $('#container').css({
+            height: new_height + 'em'
+        })
+    }
+
+</script>
+
+</body>
+</html>
