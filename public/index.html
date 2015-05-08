@@ -20,7 +20,7 @@
         #traceContainer {
             position: relative;
             background: #eee;
-            height: 2em;
+            height: 200px;
         }
 
         #container .item {
@@ -30,10 +30,11 @@
         }
 
         #traceContainer .strace {
+            cursor: crosshair;
             position: absolute;
             display: inline-block;
-            width: 2px;
-            height: 2em;
+            width: 4px;
+            height: 4px;
             background: red;
         }
 
@@ -92,17 +93,36 @@ process.nextTick(function () {
         return false;
     });
 
+    var pos = {};
+    var count = 0;
+
+    function getStraceCss(item) {
+        var id = "";
+        if (pos[item[2]]) {
+            id = pos[item[2]].id;
+        } else {
+            pos[item[2]] = {
+                id: ++count,
+                color: "#" + Math.random(1).toString(16).slice(2, 8)
+            };
+            id = count;
+        }
+
+        return {
+            top: id * 5 + 'px',
+            left: item[1] + "%",
+            backgroundColor: pos[item[2]].color
+        }
+    }
+
     function drawStrace(list) {
         var $container = $('#traceContainer');
         $container.html('');
         var len = list.length;
         $.each(list, function (i, item) {
             $('<span>').addClass('strace')
-                    .attr('title', item[2])
-                    .css({
-                        top: i / len + '%',
-                        left: item[1] + "%"
-                    })
+                    .attr('title', item[2] + item[3] + " = " + item[4])
+                    .css(getStraceCss(item))
                     .appendTo($container);
         });
     }
@@ -144,8 +164,6 @@ process.nextTick(function () {
             height: new_height + 'em'
         })
     }
-
 </script>
-
 </body>
 </html>

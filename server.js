@@ -32,7 +32,7 @@ app.get('/straceSync', function (req, res) {
   var code = req.query['code'];
   require('fs').writeFileSync('tmp.js', code);
   strace('node tmp.js', function (list) {
-    var duration = list[list.length - 1][0] - list[0][0];
+    var duration = 1.02 * list[list.length - 1][0] - list[0][0];
     list.forEach(function (item) {
       item.splice(1, 0, item[0] / duration * 100);
     });
