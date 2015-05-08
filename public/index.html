@@ -17,12 +17,33 @@
             height: 20em;
         }
 
+        #traceContainer {
+            position: relative;
+            background: #eee;
+            height: 2em;
+        }
+
         #container .item {
             cursor: crosshair;
             color: greenyellow;
             position: absolute;
         }
+
+        #traceContainer .strace {
+            position: absolute;
+            display: inline-block;
+            width: 2px;
+            height: 2em;
+            background: red;
+        }
+
+        textarea {
+            width: 100%;
+            min-height: 200px;
+        }
     </style>
+    <meta name="viewport"
+          content="width=device-width,initial-scale=1.0,maximum-scale=1.0,minimum-scale=1.0,user-scalable=no"/>
 </head>
 <body>
 <form>
@@ -52,18 +73,43 @@ process.nextTick(function () {
 process.nextTick(function () {
 });</textarea>
     <button id="evalBtn">Eval</button>
+    <button id="straceBtn">Strace</button>
 </form>
+<div id="traceContainer"></div>
 <div id="container"></div>
 <script type="text/javascript">
     $('#evalBtn').click(function () {
         $.getJSON('/eval', {code: $('#in').val()}, function (list) {
             drawData(list);
         });
+
+        return false;
+    });
+    $('#straceBtn').click(function () {
+        $.getJSON('/straceSync', {code: $('#in').val()}, function (list) {
+            drawStrace(list);
+        });
         return false;
     });
 
+    function drawStrace(list) {
+        var $container = $('#traceContainer');
+        $container.html('');
+        var len = list.length;
+        $.each(list, function (i, item) {
+            $('<span>').addClass('strace')
+                    .attr('title', item[2])
+                    .css({
+                        top: i / len + '%',
+                        left: item[1] + "%"
+                    })
+                    .appendTo($container);
+        });
+    }
+
     function drawData(list) {
-        $('#container').html('');
+        $container = $('#container');
+        $container.html('');
         var start = list[0][2];
         var totalDuration = list[list.length - 1][2] - start;
         totalDuration *= 1.02;
@@ -90,12 +136,11 @@ process.nextTick(function () {
                         top: item[1] + 'em',
                         left: item[2] + "%"
                     })
-                    .appendTo('#container');
+                    .appendTo($container);
             new_height = item[1] + 1;
             console.log(item);
         });
-
-        $('#container').css({
+        $container.css({
             height: new_height + 'em'
         })
     }
